@@ -1,0 +1,65 @@
+@echo off
+title Informations système - Meonet
+color 0a
+echo.
+echo ===================== Informations du PC =====================
+echo.
+:: Informations OS
+echo OS               : 
+ver
+echo.
+:: Informations système de base
+echo Architecture     : %PROCESSOR_ARCHITECTURE%
+echo Processeur       : %PROCESSOR_IDENTIFIER%
+echo Nombre de cores  : %NUMBER_OF_PROCESSORS%
+echo.
+:: Informations utilisateur/machine
+echo Hostname         : %COMPUTERNAME%
+echo Utilisateur      : %USERNAME%
+echo Domaine          : %USERDOMAIN%
+echo.
+:: Utilisation de WMIC (Windows Management Instrumentation) - disponible sur tous les Windows
+echo Recuperation des informations detaillees...
+echo.
+
+echo --- Fabricant et Modele ---
+wmic computersystem get Manufacturer,Model /format:list | findstr /r /v "^$"
+echo.
+
+echo --- Numero de serie ---
+wmic bios get SerialNumber /format:list | findstr /r /v "^$"
+echo.
+
+echo --- Informations OS detaillees ---
+wmic os get Caption,Version,OSArchitecture /format:list | findstr /r /v "^$"
+echo.
+
+echo --- Numero de serie du disque principal ---
+wmic diskdrive where index=0 get SerialNumber /format:list | findstr /r /v "^$"
+echo.
+
+:: Configuration réseau avec ipconfig
+echo ===== Configuration reseau =====
+echo.
+echo --- Adresses IP ---
+ipconfig | findstr /C:"Adresse IPv4"
+if %errorlevel% neq 0 (
+    echo Essai avec la syntaxe anglaise...
+    ipconfig | findstr /C:"IPv4 Address"
+)
+echo.
+echo --- Adresses MAC ---
+ipconfig /all | findstr /C:"Adresse physique"
+if %errorlevel% neq 0 (
+    echo Essai avec la syntaxe anglaise...
+    ipconfig /all | findstr /C:"Physical Address"
+)
+echo.
+echo --- Toutes les infos reseau principales ---
+ipconfig /all | findstr /C:"Carte" /C:"Adresse IPv4" /C:"Adresse physique" /C:"Masque" /C:"Passerelle"
+
+echo.
+echo ===================== Fin =====================
+echo.
+echo Appuyez sur une touche pour continuer...
+pause >nul
